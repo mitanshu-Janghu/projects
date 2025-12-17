@@ -3,8 +3,6 @@
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
-
-// Structure to store each word and its details
 struct WordData {
     char word[30];
     char category[30];
@@ -12,7 +10,6 @@ struct WordData {
     char hint[100];
 };
 
-// Structure to store user information
 struct User {
     char username[30];
     char password[30];
@@ -32,13 +29,11 @@ void displayStats(struct User user);
 void clearInputBuffer();
 int calculateScore(int remainingLives, int wordLength, char difficulty[]);
 
-// Function to clear input buffer
 void clearInputBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-// Function to display hangman stages
 void showHangman(int attempts) {
     switch (attempts) {
         case 0:
@@ -65,7 +60,6 @@ void showHangman(int attempts) {
     }
 }
 
-// Function to register a new user
 int registerUser() {
     struct User newUser;
     FILE *file;
@@ -76,7 +70,6 @@ int registerUser() {
     scanf("%s", newUser.username);
     clearInputBuffer();
     
-    // Check if username already exists
     file = fopen("users.dat", "rb");
     if (file != NULL) {
         struct User temp;
@@ -103,13 +96,11 @@ int registerUser() {
         return 0;
     }
     
-    // Initialize user statistics
     newUser.gamesPlayed = 0;
     newUser.gamesWon = 0;
     newUser.gamesLost = 0;
     newUser.totalScore = 0;
     
-    // Save user to file
     file = fopen("users.dat", "ab");
     if (file == NULL) {
         printf("Error creating user file!\n");
@@ -123,7 +114,6 @@ int registerUser() {
     return 1;
 }
 
-// Function to login user
 int loginUser(struct User *currentUser) {
     char username[30], password[30];
     FILE *file;
@@ -163,7 +153,6 @@ int loginUser(struct User *currentUser) {
     }
 }
 
-// Function to calculate score
 int calculateScore(int remainingLives, int wordLength, char difficulty[]) {
     int baseScore = wordLength * 10;
     int lifeBonus = remainingLives * 15;
@@ -179,7 +168,6 @@ int calculateScore(int remainingLives, int wordLength, char difficulty[]) {
     return (baseScore + lifeBonus) * difficultyMultiplier;
 }
 
-// Function to update user statistics
 void updateUserStats(struct User *user, int won, int score) {
     FILE *file, *tempFile;
     struct User temp;
@@ -192,7 +180,6 @@ void updateUserStats(struct User *user, int won, int score) {
         user->gamesLost++;
     }
     
-    // Update user data in file
     file = fopen("users.dat", "rb");
     tempFile = fopen("temp.dat", "wb");
     
@@ -216,7 +203,6 @@ void updateUserStats(struct User *user, int won, int score) {
     rename("temp.dat", "users.dat");
 }
 
-// Function to display user statistics
 void displayStats(struct User user) {
     float winPercentage = 0;
     if (user.gamesPlayed > 0) {
@@ -233,9 +219,8 @@ void displayStats(struct User user) {
     printf("============================\n");
 }
 
-// Function to play the game
 void playGame(struct User *currentUser) {
-    // Word bank with all details
+ 
     struct WordData words[] = {
         {"PROGRAMMING", "Technology", "Medium", "Creating software"},
         {"ELEPHANT", "Animals", "Easy", "Largest land mammal"},
@@ -256,16 +241,13 @@ void playGame(struct User *currentUser) {
     int lives = 7, wrong = 0, i, found, len, win = 0;
     int index = rand() % totalWords;
 
-    // Select a random word
     strcpy(word, words[index].word);
     len = strlen(word);
 
-    // Initialize masked word
     for (i = 0; i < len; i++)
         masked[i] = '_';
     masked[len] = '\0';
 
-    // Display initial info
     printf("\n===== HANGMAN WORD GUESSING GAME =====\n");
     printf("Category: %s\n", words[index].category);
     printf("Difficulty: %s\n", words[index].difficulty);
@@ -273,13 +255,11 @@ void playGame(struct User *currentUser) {
     printf("The word has %d letters.\n", len);
     printf("You have %d lives.\n", lives);
 
-    // Game loop
     while (wrong < lives && !win) {
         showHangman(wrong);
         printf("\nWord: %s\n", masked);
         printf("Lives remaining: %d\n", lives - wrong);
         
-        // Display guessed letters
         if (guessedCount > 0) {
             printf("Guessed letters: ");
             for (i = 0; i < guessedCount; i++) {
@@ -293,13 +273,11 @@ void playGame(struct User *currentUser) {
         clearInputBuffer();
         guess = toupper(guess);
         
-        // Validate input
         if (!isalpha(guess)) {
             printf("Please enter a valid letter!\n");
             continue;
         }
         
-        // Check for duplicate guess
         int duplicate = 0;
         for (i = 0; i < guessedCount; i++) {
             if (guessedLetters[i] == guess) {
@@ -313,7 +291,6 @@ void playGame(struct User *currentUser) {
             continue;
         }
         
-        // Add to guessed letters
         guessedLetters[guessedCount++] = guess;
 
         found = 0;
@@ -335,7 +312,6 @@ void playGame(struct User *currentUser) {
             win = 1;
     }
 
-    // Final results
     int score = 0;
     if (win) {
         printf("\n%s\n", masked);
@@ -347,7 +323,6 @@ void playGame(struct User *currentUser) {
         printf("\nYou lost! The correct word was: %s\n", word);
     }
     
-    // Update user statistics
     updateUserStats(currentUser, win, score);
     
     printf("\nGame Over.\n");
@@ -388,7 +363,6 @@ int main() {
         }
     }
     
-    // Main game menu
     while (1) {
         printf("\n===== MAIN MENU =====\n");
         printf("1. Play Game\n");
